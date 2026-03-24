@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="cozy">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>cozy study timer</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,400;0,600;1,300;1,400&family=Outfit:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+
+<canvas id="rainCanvas"></canvas>
+<div class="floaties" id="floaties"></div>
+
+<div class="wrapper">
+
+  <!-- THEME SWITCHER -->
+  <div class="theme-bar">
+    <button class="theme-pill active" onclick="setTheme('cozy',this)">☕ cozy</button>
+    <button class="theme-pill" onclick="setTheme('purple',this)">💜 girly purple</button>
+    <button class="theme-pill" onclick="setTheme('nightowl',this)">🦉 night owl</button>
+    <button class="theme-pill" onclick="setTheme('spring',this)">🌸 spring</button>
+  </div>
+
+  <!-- HEADER -->
+  <header>
+    <div class="header-top">
+      <div class="logo" id="logo">☕ cozy study</div>
+      <div class="date-tag" id="dateTag"></div>
+    </div>
+    <h1 class="hero-title">time to <em>focus</em> <span id="heroEmoji">☕</span></h1>
+    <p class="hero-sub" id="heroSub">a cozy space to study, track tasks &amp; take care of yourself</p>
+  </header>
+
+  <!-- MUSIC DOCK -->
+  <div class="music-dock">
+    <span class="dock-label">🎵 vibe</span>
+    <div class="music-tracks">
+      <button class="track-btn" onclick="playTrack(this)" data-url="https://www.youtube.com/watch?v=jfKfPfyJRdk">☕ lofi hip hop</button>
+      <button class="track-btn" onclick="playTrack(this)" data-url="https://www.youtube.com/watch?v=HuFYqnbVbzY">🎷 jazz café</button>
+      <button class="track-btn" onclick="playTrack(this)" data-url="https://www.youtube.com/watch?v=4oStw0r33so">🎹 study piano</button>
+      <button class="track-btn" onclick="playTrack(this)" data-url="https://www.youtube.com/watch?v=eKFTSSKCzWA">🌿 nature</button>
+      <button class="track-btn" onclick="playTrack(this)" data-url="https://www.youtube.com/watch?v=7NOSDKb0HlU">🌙 chillhop</button>
+    </div>
+    <button class="rain-btn" id="rainBtn" onclick="toggleRain()">🌧 rain off</button>
+  </div>
+
+  <!-- MOOD TRACKER -->
+  <section class="card">
+    <div class="card-label">how are you feeling today?</div>
+    <div class="mood-row">
+      <button class="mood-btn" data-mood="focused" onclick="setMood(this)">🎯<span>focused</span></button>
+      <button class="mood-btn" data-mood="tired"   onclick="setMood(this)">😴<span>tired</span></button>
+      <button class="mood-btn" data-mood="happy"   onclick="setMood(this)">🌸<span>happy</span></button>
+      <button class="mood-btn" data-mood="stressed" onclick="setMood(this)">😤<span>stressed</span></button>
+      <button class="mood-btn" data-mood="cozy"    onclick="setMood(this)">🧸<span>cozy</span></button>
+      <button class="mood-btn" data-mood="motivated" onclick="setMood(this)">⚡<span>motivated</span></button>
+    </div>
+    <div class="mood-msg" id="moodMsg"></div>
+  </section>
+
+  <!-- TIMER + TASKS GRID -->
+  <div class="main-grid">
+
+    <!-- POMODORO TIMER -->
+    <section class="card timer-card">
+      <div class="card-label">pomodoro timer</div>
+      <div class="mode-tabs">
+        <button class="mode-tab active" onclick="setMode('focus',this)">focus</button>
+        <button class="mode-tab" onclick="setMode('short',this)">short break</button>
+        <button class="mode-tab" onclick="setMode('long',this)">long break</button>
+      </div>
+      <div class="clock-wrap">
+        <svg class="clock-ring" viewBox="0 0 200 200">
+          <circle cx="100" cy="100" r="88" fill="none" stroke="var(--ring-bg)" stroke-width="6"/>
+          <circle cx="100" cy="100" r="88" fill="none" stroke="var(--accent)"
+            stroke-width="6" stroke-linecap="round"
+            stroke-dasharray="553" stroke-dashoffset="553" id="progressRing"
+            style="transition:stroke-dashoffset 1s linear;transform:rotate(-90deg);transform-origin:center;"/>
+        </svg>
+        <div class="clock-inner">
+          <div class="timer-display" id="timerDisplay">25:00</div>
+          <div class="timer-mode-lbl" id="timerModeLbl">focus time</div>
+        </div>
+      </div>
+      <div class="timer-controls">
+        <button class="ctrl-btn" onclick="resetTimer()">↺</button>
+        <button class="start-btn" id="startBtn" onclick="toggleTimer()">▶ start</button>
+        <button class="ctrl-btn" onclick="skipSession()">⏭</button>
+      </div>
+      <div class="session-dots">
+        <div class="s-label">sessions today</div>
+        <div class="dots-row" id="dotsRow"></div>
+      </div>
+    </section>
+
+    <!-- TASK LIST -->
+    <section class="card tasks-card">
+      <div class="card-label">today's tasks ✍️</div>
+      <div class="task-input-row">
+        <input type="text" class="task-input" id="taskInput"
+          placeholder="add a task..." maxlength="60"
+          onkeydown="if(event.key==='Enter')addTask()" />
+        <button class="add-btn" onclick="addTask()">+</button>
+      </div>
+      <div class="task-list" id="taskList"></div>
+      <div class="task-footer">
+        <span id="taskCount">0 tasks left</span>
+        <button class="clear-btn" onclick="clearDone()">clear done</button>
+      </div>
+    </section>
+
+  </div>
+
+  <!-- STATS -->
+  <section class="card">
+    <div class="card-label">today's stats ✨</div>
+    <div class="stats-row">
+      <div class="stat"><div class="stat-val" id="sF">0</div><div class="stat-lbl">sessions</div></div>
+      <div class="stat-div"></div>
+      <div class="stat"><div class="stat-val" id="sM">0</div><div class="stat-lbl">minutes</div></div>
+      <div class="stat-div"></div>
+      <div class="stat"><div class="stat-val" id="sT">0</div><div class="stat-lbl">tasks done</div></div>
+      <div class="stat-div"></div>
+      <div class="stat"><div class="stat-val" id="sS">0</div><div class="stat-lbl">day streak</div></div>
+    </div>
+  </section>
+
+  <!-- QUOTE -->
+  <div class="quote-block">
+    <div class="quote-text" id="quoteText">"The secret of getting ahead is getting started."</div>
+    <div class="quote-author" id="quoteAuthor">— Mark Twain</div>
+    <button class="new-quote-btn" onclick="newQuote()">new quote ✨</button>
+  </div>
+
+  <footer class="page-footer">
+    built with ☕ by
+    <a href="https://bargavi-codes.netlify.app" target="_blank">bargavi sivaraman</a> ·
+    <a href="https://github.com/Bargavisivaraman/study-timer" target="_blank">github ↗</a>
+  </footer>
+</div>
+
+<div class="notif" id="notif"></div>
+<script src="script.js"></script>
+</body>
+</html>
