@@ -273,7 +273,9 @@ function toggleTask(id) {
   const t = tasks.find(t => t.id === id);
   if (!t) return;
   t.done = !t.done;
-  if (t.done) { tasksDone++; updateStats(); }
+  if (t.done) tasksDone++;
+  else tasksDone = Math.max(0, tasksDone - 1);
+  updateStats();
   save();
   render();
 }
