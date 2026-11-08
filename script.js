@@ -154,6 +154,7 @@ let iv = null;
 let sessions = 0;
 let mins = 0;
 let tasksDone = 0;
+let endAt = 0; // wall-clock deadline while the timer runs
 let streak = parseInt(localStorage.getItem('studyStreak'), 10) || 0;
 let tasks = [];
 try {
@@ -179,6 +180,7 @@ function toggleTimer() { running ? pause() : start(); }
 
 function start() {
   running = true;
+  endAt = Date.now() + remain * 1000;
   const b = document.getElementById('startBtn');
   b.textContent = '⏸ pause';
   b.classList.add('running');
@@ -187,6 +189,7 @@ function start() {
 
 function pause() {
   running = false;
+  remain = Math.max(0, Math.round((endAt - Date.now()) / 1000));
   const b = document.getElementById('startBtn');
   b.textContent = '▶ resume';
   b.classList.remove('running');
@@ -194,10 +197,12 @@ function pause() {
 }
 
 function tick() {
-  if (remain <= 0) { done(); return; }
-  remain--;
+  // derive the countdown from the wall clock so throttled or late
+  // intervals (e.g. background tabs) can't make the timer drift
+  remain = Math.max(0, Math.round((endAt - Date.now()) / 1000));
   updateDisplay();
   updateRing();
+  if (remain <= 0) done();
 }
 
 function done() {
