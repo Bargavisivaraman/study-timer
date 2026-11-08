@@ -196,7 +196,6 @@ function pause() {
 function tick() {
   if (remain <= 0) { done(); return; }
   remain--;
-  if (mode === 'focus') mins = Math.floor((total - remain) / 60);
   updateDisplay();
   updateRing();
 }
