@@ -154,8 +154,14 @@ let iv = null;
 let sessions = 0;
 let mins = 0;
 let tasksDone = 0;
-let streak = parseInt(localStorage.getItem('studyStreak') || '0');
-let tasks = JSON.parse(localStorage.getItem('studyTasks') || '[]');
+let streak = parseInt(localStorage.getItem('studyStreak'), 10) || 0;
+let tasks = [];
+try {
+  const stored = JSON.parse(localStorage.getItem('studyTasks') || '[]');
+  if (Array.isArray(stored)) tasks = stored.filter(t => t && typeof t.text === 'string');
+} catch (e) {
+  localStorage.removeItem('studyTasks'); // corrupt data — start fresh instead of crashing
+}
 
 function setMode(m, el) {
   if (running) return;
